@@ -13,7 +13,7 @@ func SetupRoutes(app *fiber.App) {
 		return c.JSON(model.Response{
 			Message: "API be_latihan aktif",
 		})
-	})3
+	})
 
 	app.Post("/register", handler.Register)
 	app.Post("/login", handler.Login)
