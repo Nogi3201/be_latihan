@@ -12,8 +12,10 @@ package main
 
 import (
 	"be_latihan/config"
+	"be_latihan/docs"
 	"be_latihan/model"
 	"be_latihan/router"
+	"os"
 	"strings"
 
 	_ "be_latihan/docs"
@@ -33,6 +35,12 @@ func main() {
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
 		AllowHeaders: "Origin,Content-Type,Accept,Authorization",
 	}))
+
+	swaggerHost := os.Getenv("SWAGGER_HOST")
+	if swaggerHost == "" {
+		swaggerHost = "localhost:3000"
+	}
+	docs.SwaggerInfo.Host = swaggerHost
 
 	config.InitDB()
 
