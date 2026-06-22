@@ -12,6 +12,18 @@ import (
 	"gorm.io/gorm"
 )
 
+// Register godoc
+// @Summary Register a new user
+// @Description Register a new user with username and password
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body model.AuthRequest true "Register request"
+// @Success 201 {object} model.CreatedResponse
+// @Failure 400 {object} model.Response
+// @Failure 409 {object} model.Response
+// @Failure 500 {object} model.Response
+// @Router /register [post]
 func Register(c *fiber.Ctx) error {
 	var payload model.AuthRequest
 	if err := c.BodyParser(&payload); err != nil {
@@ -65,6 +77,18 @@ func Register(c *fiber.Ctx) error {
 	})
 }
 
+// Login godoc
+// @Summary Login user
+// @Description Login with username and password to get JWT token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body model.AuthRequest true "Login request"
+// @Success 200 {object} model.LoginResponse
+// @Failure 400 {object} model.Response
+// @Failure 401 {object} model.UnauthorizedResponse
+// @Failure 500 {object} model.Response
+// @Router /login [post]
 func Login(c *fiber.Ctx) error {
 	var payload model.AuthRequest
 	if err := c.BodyParser(&payload); err != nil {
@@ -112,5 +136,63 @@ func Login(c *fiber.Ctx) error {
 				Role:     user.Role,
 			},
 		},
+	})
+}
+
+// ChangePassword godoc
+// @Summary Change user password
+// @Description Change the password of the currently authenticated user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body model.ChangePasswordRequest true "Change Password Request"
+// @Success 200 {object} model.SuccessResponse
+// @Failure 400 {object} model.Response
+// @Failure 401 {object} model.UnauthorizedResponse
+// @Failure 404 {object} model.Response
+// @Failure 500 {object} model.Response
+// @Router /api/change-password [post]
+func ChangePassword(c *fiber.Ctx) error {
+	username := c.Locals("username").(string)
+
+	var payload model.ChangePasswordRequest
+	if err := c.BodyParser(&payload); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(model.Response{
+			Message: "payload tidak valid",
+			Error:   err.Error(),
+		})
+	}
+
+	user, err := repository.FindUserByUsername(username)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(model.Response{
+			Message: "user tidak ditemukan",
+		})
+	}
+
+	if !password.CheckPasswordHash(payload.PasswordLama, user.Password) {
+		return c.Status(fiber.StatusUnauthorized).JSON(model.Response{
+			Message: "password lama salah",
+		})
+	}
+
+	hashedPassword, err := password.HashPassword(payload.PasswordBaru)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(model.Response{
+			Message: "gagal membuat hash password baru",
+		})
+	}
+
+	err = repository.UpdateUserPassword(username, hashedPassword)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(model.Response{
+			Message: "gagal update password",
+			Error:   err.Error(),
+		})
+	}
+
+	return c.JSON(model.Response{
+		Message: "password berhasil diubah",
 	})
 }

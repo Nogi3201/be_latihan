@@ -9,6 +9,17 @@ import (
 	"gorm.io/gorm"
 )
 
+// GetAllMahasiswa godoc
+// @Summary Get all mahasiswa
+// @Description Retrieve a list of all mahasiswa
+// @Tags Mahasiswa
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} model.Response
+// @Failure 401 {object} model.UnauthorizedResponse
+// @Failure 500 {object} model.Response
+// @Router /api/mahasiswa [get]
 func GetAllMahasiswa(c *fiber.Ctx) error {
 	data, err := repository.GetAllMahasiswa()
 	if err != nil {
@@ -24,6 +35,20 @@ func GetAllMahasiswa(c *fiber.Ctx) error {
 	})
 }
 
+// GetMahasiswaByNPM godoc
+// @Summary Get mahasiswa by NPM
+// @Description Retrieve a single mahasiswa by its NPM
+// @Tags Mahasiswa
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param npm path int true "Mahasiswa NPM"
+// @Success 200 {object} model.Response
+// @Failure 400 {object} model.Response
+// @Failure 401 {object} model.UnauthorizedResponse
+// @Failure 404 {object} model.Response
+// @Failure 500 {object} model.Response
+// @Router /api/mahasiswa/{npm} [get]
 func GetMahasiswaByNPM(c *fiber.Ctx) error {
 	//npmQuery := c.Params("npm")
 	//if npmQuery == "" {
@@ -60,6 +85,19 @@ func GetMahasiswaByNPM(c *fiber.Ctx) error {
 	})
 }
 
+// InsertMahasiswa godoc
+// @Summary Insert new mahasiswa
+// @Description Add a new mahasiswa to the database
+// @Tags Mahasiswa
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body model.Mahasiswa true "Mahasiswa Data"
+// @Success 201 {object} model.CreatedResponse
+// @Failure 400 {object} model.Response
+// @Failure 401 {object} model.UnauthorizedResponse
+// @Failure 500 {object} model.Response
+// @Router /api/mahasiswa [post]
 func InsertMahasiswa(c *fiber.Ctx) error {
 	var payload model.Mahasiswa
 	if err := c.BodyParser(&payload); err != nil {
@@ -83,6 +121,21 @@ func InsertMahasiswa(c *fiber.Ctx) error {
 	})
 }
 
+// UpdateMahasiswa godoc
+// @Summary Update mahasiswa data
+// @Description Update existing mahasiswa data by NPM
+// @Tags Mahasiswa
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param npm path int true "Mahasiswa NPM"
+// @Param request body model.Mahasiswa true "Updated Mahasiswa Data"
+// @Success 200 {object} model.SuccessResponse
+// @Failure 400 {object} model.Response
+// @Failure 401 {object} model.UnauthorizedResponse
+// @Failure 404 {object} model.Response
+// @Failure 500 {object} model.Response
+// @Router /api/mahasiswa/{npm} [put]
 func UpdateMahasiswa(c *fiber.Ctx) error {
 	npm, err := strconv.ParseInt(c.Params("npm"), 10, 64)
 	if err != nil {
@@ -120,6 +173,19 @@ func UpdateMahasiswa(c *fiber.Ctx) error {
 	})
 }
 
+// DeleteMahasiswa godoc
+// @Summary Delete mahasiswa
+// @Description Delete a mahasiswa from the database by NPM
+// @Tags Mahasiswa
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param npm path int true "Mahasiswa NPM"
+// @Success 200 {object} model.SuccessResponse
+// @Failure 400 {object} model.Response
+// @Failure 401 {object} model.UnauthorizedResponse
+// @Failure 500 {object} model.Response
+// @Router /api/mahasiswa/{npm} [delete]
 func DeleteMahasiswa(c *fiber.Ctx) error {
 	npm, err := strconv.ParseInt(c.Params("npm"), 10, 64)
 	if err != nil {

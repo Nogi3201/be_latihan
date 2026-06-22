@@ -6,6 +6,7 @@ import (
 	"be_latihan/model"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
 )
 
 func SetupRoutes(app *fiber.App) {
@@ -15,8 +16,12 @@ func SetupRoutes(app *fiber.App) {
 		})
 	})
 
+	app.Get("/docs/*", swagger.HandlerDefault)
+
 	app.Post("/register", handler.Register)
 	app.Post("/login", handler.Login)
+
+	app.Post("/api/change-password", middleware.JWTProtected(""), handler.ChangePassword)
 
 	mahasiswa := app.Group("/api/mahasiswa", middleware.JWTProtected("admin"))
 	mahasiswa.Get("/", handler.GetAllMahasiswa)
